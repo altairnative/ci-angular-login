@@ -137,7 +137,7 @@ $config['subclass_prefix'] = 'MY_';
 |	autoloading (application/config/autoload.php)
 */
 $config['composer_autoload'] = TRUE;
-require_once APPPATH.'../vendor/autoload.php';
+require_once 'vendor/autoload.php';
 /*
 |--------------------------------------------------------------------------
 | Allowed URL Characters

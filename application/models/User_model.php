@@ -20,4 +20,14 @@ class User_model extends CI_Model
 			->get()
 			->row();
 	}
+
+	public function all()
+	{
+		return $this->db->get(self::TABLE)->result_array();
+	}
+
+	public function getWhere(array $where = [])
+	{
+		return $this->db->get_where(self::TABLE, $where)->result();
+	}
 }

@@ -52,6 +52,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'LoginController';
 $route['register'] = 'RegisterController';
 $route['api/register']['post'] = 'api/Register/store';
+$route['api/authenticate']['post'] = 'api/Login/authenticate';
+$route['api/users']['get'] = 'api/user/index';
 $route['token'] = 'TokenController';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
