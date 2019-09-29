@@ -11,6 +11,11 @@ window.routes = {
         controller: 'dashboardController',
         authenticated: true
     },
+    "/dashboard/users": {
+        templateUrl: '/dashboard/users',
+        controller: 'dashboardController',
+        authenticated: true
+    },
     "/register": {
         templateUrl: '/register',
         controller: 'registerController',

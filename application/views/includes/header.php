@@ -16,5 +16,6 @@
     <script src="<?php echo base_url(); ?>js/controllers/login-controller.js" type="text/javascript"></script>
     <script src="<?php echo base_url(); ?>js/controllers/register-controller.js" type="text/javascript"></script>
     <script src="<?php echo base_url(); ?>js/controllers/dashboard-controller.js" type="text/javascript"></script>
+    <base href="<?php echo base_url() ?>">
 </head>
 <body ng-app="myApp">
