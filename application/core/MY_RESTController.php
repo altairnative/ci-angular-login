@@ -61,7 +61,7 @@ class MY_RESTController extends CI_Controller
 	public function validateAuth()
 	{
 		if (!isset($this->headers['Authorization'])) {
-			$this->show_json_error('Unauthenticated.', 400);
+			$this->show_json_error('Unauthenticated.', 401);
 		}
 
 		list($token) = sscanf( $this->headers['Authorization'], 'Bearer %s');
