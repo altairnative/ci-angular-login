@@ -16,6 +16,12 @@ class User extends MY_RESTController
 	public function index()
 	{
 		$users = $this->user_model->all();
-		return $this->response(['data' => $users]);
-	}
+		return $this->response(['users' => $users]);
+    }
+
+    public function me()
+    {
+        $user = $this->getAuthUser();
+        return $this->response(['currentUser' => $user]);
+    }
 }

@@ -25,7 +25,7 @@ class Login extends MY_RESTController
 
 		$user = $this->user_model->getWhere(array('email' => $this->input->post('email')));
 		if (empty($user) || !password_verify($this->input->post('password'), $user[0]->password)) {
-			return $this->response(['message' => 'Email/Password is incorrect.'], 404);
+			return $this->response(['message' => 'Email/Password is incorrect.'], 401);
 		}
 
 		$token = JWT::encode([

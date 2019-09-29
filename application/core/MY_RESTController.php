@@ -6,9 +6,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class MY_RESTController extends CI_Controller
 {
+    private $headers;
+
 	public function __construct()
 	{
-		parent::__construct();
+        parent::__construct();
+        $this->headers = $this->input->request_headers();
 		$this->config->load('jwt');
 		$this->load->library('form_validation');
 	}
@@ -29,7 +32,7 @@ class MY_RESTController extends CI_Controller
 		return $OBJ->error_array($prefix, $suffix);
 	}
 
-	function show_json_error($message, $status_code = 500, $status_message = '')
+	public function show_json_error($message, $status_code = 500, $status_message = '')
 	{
 		header('Cache-Control: no-cache, must-revalidate');
 		header('Content-type: application/json');
@@ -41,16 +44,27 @@ class MY_RESTController extends CI_Controller
 		]);
 
 		exit;
-	}
+    }
+
+    public function getAuthUser()
+    {
+        list($token) = sscanf( $this->headers['Authorization'], 'Bearer %s');
+        $decodedJson = JWT::decode(
+            $token,
+            $this->config->item('secret_key'),
+            $this->config->item('algorithm')
+        );
+
+        return $decodedJson->data;
+    }
 
 	public function validateAuth()
 	{
-		$headers = $this->input->request_headers();
-		if (!isset($headers['Authorization'])) {
+		if (!isset($this->headers['Authorization'])) {
 			$this->show_json_error('Unauthenticated.', 400);
 		}
 
-		list($token) = sscanf( $headers['Authorization'], 'Bearer %s');
+		list($token) = sscanf( $this->headers['Authorization'], 'Bearer %s');
 		if (!$token) {
 			$this->show_json_error('Bad Request on bearer token.', 400);
 		}
@@ -63,7 +77,7 @@ class MY_RESTController extends CI_Controller
 			);
 
 		} catch (Exception $e) {
-			$this->show_json_error($e->getMessage());
+			$this->show_json_error($e->getMessage(), 401);
 		}
 
 		exit();

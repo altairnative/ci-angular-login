@@ -1,56 +1,73 @@
-const app = angular.module('myApp', []);
+const app = angular.module('myApp', ['ngCookies', 'ngRoute']);
 
-app.controller("registerController", ($scope, $http) => {
-    $scope.error = {
-        firstName: null,
-        lastName: null,
-        email: null,
-        password: null
-    };
+window.routes = {
+    "/": {
+        templateUrl: '/',
+        controller: 'loginController',
+        authenticated: false
+    },
+    "/dashboard": {
+        templateUrl: '/dashboard',
+        controller: 'dashboardController',
+        authenticated: true
+    },
+    "/register": {
+        templateUrl: '/register',
+        controller: 'registerController',
+        authenticated: false
+    }
+};
 
-    $scope.user = {
-        firstName: null,
-        lastName: null,
-        email: null,
-        password: null
-    };
+app.service('currentUser', ['$rootScope', '$http', '$cookies', function($rootScope, $http, $cookies) {
+    return {
+        init: (() => {
+            $http({
+                method: 'get',
+                url: `${window.location.origin}/api/users/me`,
+                headers: {
+                    'Authorization': `Bearer ${$cookies.get('APP_ACCESS_TOKEN')}`
+                }
+            })
+            .then(({ data: { currentUser } }) => {
+                $rootScope.currentUser = currentUser;
+            });
+        }),
 
-    $scope.clearAll = (() => {
-        $scope.user.firstName = null;
-        $scope.user.lastName = null;
-        $scope.user.email = null;
-        $scope.user.password = null;
-        $scope.error.firstName = null;
-        $scope.error.lastName = null;
-        $scope.error.email = null;
-        $scope.error.password = null;
-    });
-
-    $scope.setErrors = ((errors) => {
-        $scope.error.firstName = errors.firstName
-        $scope.error.lastName = errors.lastName
-        $scope.error.email = errors.email
-        $scope.error.password = errors.password
-    });
-
-    $scope.register = ((user) => {
-        $http({
-            method: 'post',
-            data: $.param(user),
-            url: 'api/register',
-            headers: {
-                'Content-type': 'application/x-www-form-urlencoded'
+        isAuthenticated: (() => {
+            if ($cookies.get('APP_ACCESS_TOKEN')) {
+                return true;
             }
+
+            return false;
         })
-        .then(({ data: { message } }) => {
-            $scope.clearAll();
-            $scope.registrationForm.$setPristine();
-            $scope.showSuccess = true;
-            $scope.successMessage = message;
-        })
-        .catch(({ data: { errors } }) => {
-            $scope.setErrors(errors);
-            $scope.showSuccess = false;
-        });
+    }
+}]);
+
+app.config(['$routeProvider', '$locationProvider', ($routeProvider, $locationProvider) => {
+    $locationProvider.html5Mode(false);
+    $locationProvider.hashPrefix('');
+
+    for(let path in window.routes) {
+        $routeProvider.when(path, window.routes[path]);
+    }
+    $routeProvider.otherwise({redirectTo: '/'});
+}]);
+
+app.run(['$rootScope', 'currentUser', ($rootScope, currentUser) => {
+    $rootScope.$on('$locationChangeStart', (event, next, current) => {
+        if (currentUser.isAuthenticated()) {
+            currentUser.init();
+            if (window.location.pathname == '/' || window.location.pathname == '/register') {
+                window.location.href = `${window.location.origin}/dashboard`;
+            }
+        }
+
+        for(let i in window.routes) {
+            if(next.indexOf(i) != -1) {
+                if(window.routes[i].authenticated && !currentUser.isAuthenticated()) {
+                    window.location.href="/";
+                }
+            }
+        }
     });
-});
+}]);
