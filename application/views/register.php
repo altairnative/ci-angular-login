@@ -30,6 +30,12 @@
                         <small class="is-invalid text-danger">{{ error.password }}</small>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block btn-lg">Register</button>
+                    <div class="text-center">
+                        <small>
+                            Already registered?
+                            <a href="<?php base_url(); ?>/">Login here</a>
+                        </small>
+                    </div>
                 </form>
             </div>
         </div>
