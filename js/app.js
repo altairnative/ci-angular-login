@@ -35,6 +35,12 @@ app.service('currentUser', ['$rootScope', '$http', '$cookies', function($rootSco
             })
             .then(({ data: { currentUser } }) => {
                 $rootScope.currentUser = currentUser;
+            })
+            .catch((error) => {
+                if (error.status === 401) {
+                    $cookies.remove('APP_ACCESS_TOKEN');
+                    window.location.href = window.location.origin;
+                }
             });
         }),
 
@@ -49,7 +55,6 @@ app.service('currentUser', ['$rootScope', '$http', '$cookies', function($rootSco
 }]);
 
 app.config(['$routeProvider', '$locationProvider', ($routeProvider, $locationProvider) => {
-    $locationProvider.html5Mode(false);
     $locationProvider.hashPrefix('');
 
     for(let path in window.routes) {
